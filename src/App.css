@@ -1,0 +1,67 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.board {
+  padding: 20px;
+}
+
+.board.find-mode {
+  background-color: darkseagreen;
+}
+
+button {
+  height: 50px;
+  font-size: 20px;
+  background-color: dodgerblue;
+  color: white;
+  border-radius: 10px;
+}
+
+.change-case {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.find-game {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.letter-container {
+  cursor: pointer;
+  display: inline-block;
+  border-radius: 40px;
+  height: 150px;
+  width: 150px;
+  margin: 5px;
+  font-size: 120px;
+  border-color: darkblue;
+  border-style: solid;
+  border-width: 1px;
+  background-color: dodgerblue;
+  color: yellow;
+}
