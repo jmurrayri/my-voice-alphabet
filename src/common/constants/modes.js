@@ -1,0 +1,5 @@
+export default {
+    TRANSITIONING: 'TRANSITIONING',
+    FREE: 'FREE',
+    FIND_THE_LETTER: 'FIND_THE_LETTER',
+}

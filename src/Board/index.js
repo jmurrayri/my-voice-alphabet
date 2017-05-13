@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import Letter from '../Letter';
 import classNames from 'classnames';
+import cases from '../common/constants/cases';
+import modes from '../common/constants/modes';
+
 import * as audioUtil from '../common/util/audioUtil';
 
 const START_LETTER_CHAR_CODE = 65;
@@ -16,12 +19,15 @@ export default class extends Component {
         }
 
         this.state = {
-            mode: 'NORMAL',
-            casing: 'UPPER',
+            mode: modes.FREE,
+            casing: cases.UPPER,
             selectedLetter: null,
-            letters
+            letters,
+            unusedLetters: [...letters],
         };
 
+        this.chooseRandomLetterToFind = this.chooseRandomLetterToFind.bind(this);
+        this.replayLetter = this.replayLetter.bind(this);
         this.toggleCase = this.toggleCase.bind(this);
         this.selectLetter = this.selectLetter.bind(this);
         this.playFindTheLetter = this.playFindTheLetter.bind(this);
@@ -31,28 +37,25 @@ export default class extends Component {
     toggleCase() {
         const { casing } = this.state;
 
-        if (casing === 'UPPER') {
+        if (casing === cases.UPPER) {
             this.setState({
-                casing: 'LOWER'
+                casing: cases.LOWER
             });
         }
         else {
             this.setState({
-                casing: 'UPPER'
+                casing: cases.UPPER
             });
         }
     }
 
-    selectLetter(letter) {
+    async selectLetter(letter) {
         const {mode, selectedLetter} = this.state;
 
-        if (mode === 'FIND') {
+        if (mode === modes.FIND_THE_LETTER) {
             if (selectedLetter === letter) {
-                audioUtil.playAudio('ThatsRight');
-                this.setState({
-                    mode: 'NORMAL',
-                    selectedLetter: null,
-                });
+                await audioUtil.playAudio('ThatsRight');
+                this.chooseRandomLetterToFind();
             }
             else {
                 audioUtil.playAudio('TryAgain');
@@ -64,36 +67,56 @@ export default class extends Component {
         }
     }
 
+    replayLetter() {
+        const {selectedLetter} = this.state;
+
+        if (selectedLetter) {
+            audioUtil.playAudio(selectedLetter);
+        }
+    }
+
     quitFindTheLetter() {
         this.setState({
-            mode: 'NORMAL',
+            mode: modes.FREE,
             selectedLetter: null,
         });
     }
 
-    playFindTheLetter() {
-        const {letters} = this.state;
-
-        audioUtil.playAudio('FindTheLetter');
+    async playFindTheLetter() {
+        await audioUtil.playAudio('FindTheLetter');
 
         this.setState({
-            mode: 'FIND',
+            mode: modes.TRANSITIONING,
         });
 
-        setTimeout(()=> {
-            const selectedLetter = audioUtil.playRandom(letters);
+        this.chooseRandomLetterToFind();
+    }
 
-            this.setState({
-                selectedLetter
-            });
-        }, 3500);
+    chooseRandomLetterToFind() {
+        const {unusedLetters, letters} = this.state;
+        const selectedLetter = audioUtil.playRandom(unusedLetters);
+
+        const index = unusedLetters.indexOf(selectedLetter);
+        let newUnusedLetters = [...unusedLetters];
+        if (newUnusedLetters.length === 1) {
+            newUnusedLetters = [...letters];
+        }
+        else {
+            newUnusedLetters.splice(index, 1);
+        }
+
+        this.setState({
+            mode: modes.FIND_THE_LETTER,
+            selectedLetter,
+            unusedLetters: newUnusedLetters,
+        });
     }
 
     render() {
         const {casing, letters, mode} = this.state;
 
         const casedLetters = letters.map((l)=> {
-            if (casing === 'UPPER') {
+            if (casing === cases.UPPER) {
                 return l.toUpperCase();
             }
             else {
@@ -102,15 +125,20 @@ export default class extends Component {
         });
 
         return (
-            <div className={classNames('board', {'find-mode': mode === 'FIND'})}>
+            <div className={classNames('board', {'find-mode': mode === modes.FIND_THE_LETTER})}>
                 {casedLetters.map((l) => {
                     return (
                         <Letter key={l} letter={l} handleClick={this.selectLetter} />
                     );
                 })}
-                {mode === 'FIND' && <button className="quit-find-the-letter find-game" onClick={() => this.quitFindTheLetter()}>QUIT</button>}
-                {mode !== 'FIND' && <button className="find-the-letter find-game" onClick={() => this.playFindTheLetter()}>PLAY FIND THE LETTER</button>}
-                <button className="change-case" onClick={() => this.toggleCase()}>CHANGE CASE</button>
+                <div className="buttons-left">
+                    {mode === modes.FIND_THE_LETTER && <button className="quit-find-the-letter game-button" onClick={() => this.quitFindTheLetter()}>QUIT</button>}
+                    {mode === modes.FIND_THE_LETTER && <button className="hear-again game-button" onClick={() => this.replayLetter()}>HEAR IT AGAIN</button>}
+                        {mode === modes.FREE && <button className="find-the-letter game-button" onClick={() => this.playFindTheLetter()}>PLAY FIND THE LETTER</button>}
+                </div>
+                <div className="buttons-right">
+                    <button className="change-case" onClick={() => this.toggleCase()}>CHANGE CASE</button>
+                </div>
             </div>
         )
     }

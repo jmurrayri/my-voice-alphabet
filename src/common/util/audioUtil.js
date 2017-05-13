@@ -1,8 +1,21 @@
 export const playAudio = function(fileName) {
-    const fullPath = `./sound/${fileName}.m4a`;
-    const audio = new Audio(fullPath);
+    return new Promise((resolve) => {
+        const fullPath = `./sound/${fileName}.m4a`;
+        const audio = new Audio(fullPath);
+        audio.play();
 
-    audio.play();
+        // Must pause until the audio has finished playing.
+        (function waitUntilEnded() {
+            setTimeout(()=> {
+                if (audio.ended) {
+                    resolve();
+                }
+                else {
+                    waitUntilEnded();
+                }
+            }, 500);
+        }());
+    });
 };
 
 export const playRandom = function(letters) {

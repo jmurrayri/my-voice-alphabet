@@ -24,6 +24,11 @@
 }
 
 .board {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 20px;
 }
 
@@ -39,13 +44,13 @@ button {
   border-radius: 10px;
 }
 
-.change-case {
+.buttons-right {
   position: absolute;
   bottom: 10px;
   right: 10px;
 }
 
-.find-game {
+.buttons-left {
   position: absolute;
   bottom: 10px;
   left: 10px;
