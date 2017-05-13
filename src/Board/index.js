@@ -53,7 +53,7 @@ export default class extends Component {
         const {mode, selectedLetter} = this.state;
 
         if (mode === modes.FIND_THE_LETTER) {
-            if (selectedLetter === letter) {
+            if (selectedLetter.toUpperCase() === letter.toUpperCase()) {
                 await audioUtil.playAudio('ThatsRight');
                 this.chooseRandomLetterToFind();
             }
